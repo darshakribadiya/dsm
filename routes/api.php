@@ -14,19 +14,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
 
-    // Roles
-    Route::get('/roles', [AuthController::class, 'listRoles']);
+    Route::get('/roles', [AuthController::class, 'getRolesWithPermissions']);
     Route::post('/roles', [AuthController::class, 'createRole']);
-    Route::put('/roles/{id}', [AuthController::class, 'updateRole']);
-    Route::delete('/roles/{id}', [AuthController::class, 'deleteRole']);
+    Route::put('/roles/{id}/permissions', [AuthController::class, 'updateRolePermissions']);
+    Route::get('/permissions', [AuthController::class, 'getAllPermissions']);
 
-    // Permissions
-    Route::get('/permissions', [AuthController::class, 'listPermissions']);
-
-    // Users
-    Route::get('/users', [AuthController::class, 'listUsers']);
-    Route::post('/users', [AuthController::class, 'createUser']);
-    Route::put('/users/{id}', [AuthController::class, 'updateUser']);
-    Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
 });
 Route::get('/all-users', [AuthController::class, 'allUsers']);
