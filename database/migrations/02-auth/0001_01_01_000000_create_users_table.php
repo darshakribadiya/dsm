@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 255);
+            $table->string('avatar', 255)->nullable();
             $table->enum('user_type', ['faculty', 'hostel_staff', 'general', 'student', 'parent', 'admin']);
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
             $table->string('contact')->nullable();
