@@ -10,12 +10,15 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('roles', function (Blueprint $table) {
+        Schema::create('invitations', function (Blueprint $table) {
             $table->id();
-            $table->string('role_name', 100)->unique();
-            $table->string('label')->nullable();
+            $table->string('email')->unique();
+            $table->string('token')->unique();
+            $table->timestamp('expires_at')->nullable();
+            $table->boolean('accepted')->default(false);
             $table->timestamps();
         });
+
     }
 
     /**
@@ -23,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('roles');
+        Schema::dropIfExists('invitations');
     }
 };
