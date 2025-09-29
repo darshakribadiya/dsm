@@ -12,9 +12,12 @@ return new class extends Migration {
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('permission_name', 100)->unique();
+            $table->string('permission_name', 100);
             $table->enum('action', ['create', 'read', 'update', 'delete']);
             $table->timestamps();
+
+            // Unique constraint on combination of permission_name and action
+            $table->unique(['permission_name', 'action'], 'permissions_name_action_unique');
         });
     }
 
