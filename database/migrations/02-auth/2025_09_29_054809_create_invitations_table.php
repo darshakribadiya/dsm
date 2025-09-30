@@ -13,11 +13,14 @@ return new class extends Migration {
         Schema::create('invitations', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
+            $table->foreignId('role_id')->constrained('roles');
             $table->string('token')->unique();
             $table->timestamp('expires_at')->nullable();
             $table->boolean('accepted')->default(false);
+            $table->foreignId('invited_by')->constrained('users');
             $table->timestamps();
         });
+
 
     }
 

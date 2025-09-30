@@ -2,9 +2,12 @@
 
 namespace App\Services\Admin;
 
+use App\Models\Auth\UserInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Mail\Admin\UserInvitationMail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthService
 {
@@ -51,4 +54,23 @@ class AuthService
             'status' => 200,
         ];
     }
+
+    public function sendInvitation(array $data, int $invitedBy): UserInvitation
+    {
+        $token = Str::random(64);
+
+        $invitation = UserInvitation::create([
+            'email' => $data['email'],
+            'role_id' => $data['role_id'],
+            'token' => $token,
+            'expires_at' => now()->addDays(7),
+            'invited_by' => $invitedBy,
+        ]);
+
+        Mail::to($invitation->email)->send(new UserInvitationMail($invitation));
+
+        return $invitation->load('role');
+    }
+
+
 }
