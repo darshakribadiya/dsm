@@ -7,94 +7,137 @@
     <title>User Invitation</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             line-height: 1.6;
-            color: #333;
-            max-width: 600px;
+            color: #000;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 640px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 32px 10px;
+        }
+
+        .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 16px;
+            background: #fff;
         }
 
         .header {
-            background-color: #f8f9fa;
-            padding: 20px;
             text-align: center;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            border-bottom: 1px solid #e5e5e5;
+            padding-bottom: 16px;
+            margin-bottom: 24px;
         }
 
-        .content {
-            background-color: #ffffff;
-            padding: 20px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            color: #000;
+        }
+
+        .content h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0 0 16px;
+            color: #000;
+        }
+
+        .content p {
+            margin: 12px 0;
+            color: #111;
+            font-size: 15px;
         }
 
         .button {
             display: inline-block;
-            background-color: #007bff;
-            color: white;
+            background-color: #000;
+            color: #fff !important;
             padding: 12px 24px;
             text-decoration: none;
-            border-radius: 5px;
-            margin: 20px 0;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 15px;
+            margin: 24px 0;
         }
 
         .button:hover {
-            background-color: #0056b3;
+            background-color: #333;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin: 12px 0;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+            color: #111;
+            font-size: 14px;
         }
 
         .footer {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #6c757d;
+            border-top: 1px solid #e5e5e5;
+            padding-top: 20px;
+            margin-top: 32px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        strong {
+            color: #000;
         }
     </style>
 </head>
 
 <body>
-    <div class="header">
-        <h1>Welcome to {{ config('app.name') }}</h1>
-    </div>
+    <div class="container">
+        <div class="card">
+            <!-- Header -->
+            <div class="header">
+                <h1>Welcome to {{ config('app.name') }}</h1>
+            </div>
 
-    <div class="content">
-        <h2>You're Invited!</h2>
+            <!-- Content -->
+            <div class="content">
+                <h2>You're Invited</h2>
+                <p>Hello,</p>
 
-        <p>Hello,</p>
+                <p>You have been invited to join <strong>{{ config('app.name') }}</strong> as a
+                    <strong>{{ $invitation->role->name }}</strong>.
+                </p>
 
-        <p>You have been invited to join <strong>{{ config('app.name') }}</strong> as a
-            <strong>{{ $invitation->role->name }}</strong>.
-        </p>
+                <p>To accept this invitation and set up your account, please click below:</p>
 
-        <p>To accept this invitation and create your account, please click the button below:</p>
+                <div style="text-align: center;">
+                    <a href="{{ $invitationLink }}" class="button">Accept Invitation</a>
+                </div>
 
-        <div style="text-align: center;">
-            <a href="{{ $invitationLink }}" class="button">Accept Invitation</a>
+                <p><strong>Important:</strong></p>
+                <ul>
+                    <li>This invitation expires on {{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}.</li>
+                    <li>If you prefer not to accept, you can ignore this email.</li>
+                </ul>
+
+                <p>If you have questions, please reach out to your administrator.</p>
+
+                <p>Best regards,<br>
+                    The {{ config('app.name') }} Team</p>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>This invitation was sent by {{ $invitation->inviter->name ?? 'an administrator' }}.</p>
+                <p>If you weren’t expecting this, kindly disregard this email.</p>
+            </div>
         </div>
-
-        <p><strong>Important:</strong></p>
-        <ul>
-            <li>This invitation will expire on {{ $invitation->expires_at->format('F j, Y \a\t g:i A') }}</li>
-            <li>If you don't want to accept this invitation, you can simply ignore this email</li>
-            <li>If the button doesn't work, you can copy and paste this link into your browser:</li>
-        </ul>
-
-        <p style="word-break: break-all; background-color: #f8f9fa; padding: 10px; border-radius: 4px;">
-            {{ $invitationLink }}
-        </p>
-
-        <p>If you have any questions, please contact the administrator.</p>
-
-        <p>Best regards,<br>
-            The {{ config('app.name') }} Team</p>
-    </div>
-
-    <div class="footer">
-        <p>This invitation was sent by {{ $invitation->inviter->name ?? 'an administrator' }}.</p>
-        <p>If you didn't expect this invitation, please ignore this email.</p>
     </div>
 </body>
 

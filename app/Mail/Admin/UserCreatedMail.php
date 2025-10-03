@@ -8,20 +8,20 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Auth\UserInvitation;
+use App\Models\User;
 
-class UserInvitationMail extends Mailable
+class UserCreatedMail extends Mailable
 {
     use Queueable, SerializesModels;
+    protected User $user;
 
-    protected $invitation;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(UserInvitation $invitation)
+    public function __construct(User $user)
     {
-        $this->invitation = $invitation;
+        $this->user = $user;
     }
 
     /**
@@ -30,7 +30,7 @@ class UserInvitationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'User Invitation Mail',
+            subject: 'Your Account Has Been Created Successfully',
         );
     }
 
@@ -39,14 +39,10 @@ class UserInvitationMail extends Mailable
      */
     public function content(): Content
     {
-        $frontendUrl = env('FRONTEND_APP_URL');
-        $invitationLink = $frontendUrl . '/accept-invitation?token=' . $this->invitation->token;
-
         return new Content(
-            view: 'Admin.Mail.user-invitation',
+            view: 'Admin.Mail.user-created',
             with: [
-                'invitation' => $this->invitation,
-                'invitationLink' => $invitationLink,
+                'user' => $this->user,
             ]
         );
     }

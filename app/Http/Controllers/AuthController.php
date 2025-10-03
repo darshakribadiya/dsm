@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Auth\UserInvitation;
+use App\Models\User;
 use App\Services\Admin\{AuthService, UserService};
 use Illuminate\Http\Request;
 use App\Mail\Admin\UserInvitationMail;
@@ -84,7 +85,7 @@ class AuthController extends Controller
     /**
      * Accept an invitation
      */
-    public function acceptInvitation(Request $request)
+    public function acceptInvitation(Request $request, AuthService $authService)
     {
         $request->validate([
             'token' => 'required|string',
@@ -92,61 +93,67 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        $invitation = UserInvitation::where('token', $request->token)
-            ->where('accepted', false)
-            ->where('expires_at', '>', now())
-            ->first();
+        $result = $authService->acceptInvitation($request->only(['token', 'password', 'name']));
 
-        if (!$invitation) {
-            return response()->json([
-                'message' => 'Invalid or expired invitation token'
-            ], 400);
-        }
-
-        // Create user account
-        $user = \App\Models\User::create([
-            'name' => $request->name,
-            'email' => $invitation->email,
-            'password' => bcrypt($request->password),
-        ]);
-
-        // Assign role to user
-        $user->roles()->attach($invitation->role_id);
-
-        // Mark invitation as accepted
-        $invitation->update(['accepted' => true]);
-
-        return response()->json([
-            'message' => 'Account created successfully. You can now login.',
-            'data' => $user
-        ], 201);
+        return response()->json(
+            isset($result['data']) ? ['message' => $result['message'], 'data' => $result['data']] : ['message' => $result['message']],
+            $result['status']
+        );
     }
 
     /**
      * Get invitation details by token
      */
-    public function getInvitation(Request $request)
+    public function getInvitation(Request $request, AuthService $authService)
     {
         $request->validate([
             'token' => 'required|string',
         ]);
 
-        $invitation = UserInvitation::where('token', $request->token)
-            ->where('accepted', false)
-            ->where('expires_at', '>', now())
-            ->with('role')
+        $result = $authService->getInvitation($request->token);
+
+        return response()->json(
+            isset($result['data']) ? ['data' => $result['data']] : ['message' => $result['message']],
+            $result['status']
+        );
+    }
+
+    public function listInvitations(Request $request, AuthService $authService)
+    {
+        $search = $request->query('search');
+        $status = $request->query('status');
+
+        $invitations = $authService->listInvitations($search, $status);
+
+        return response()->json([
+            'data' => $invitations
+        ], 200);
+    }
+
+    /**
+     * Cancel (revoke) an invitation
+     */
+    public function cancelInvitation(string $id)
+    {
+        $invitation = UserInvitation::where('id', $id)
+            ->where('accepted', false) // Cannot revoke if already accepted
             ->first();
 
         if (!$invitation) {
             return response()->json([
-                'message' => 'Invalid or expired invitation token'
-            ], 400);
+                'message' => 'Invitation not found or already accepted.'
+            ], 404);
         }
 
+        $invitation->delete();
+
         return response()->json([
-            'data' => $invitation
+            'message' => 'Invitation has been revoked successfully.'
         ], 200);
     }
+
+
+
 
 
 }

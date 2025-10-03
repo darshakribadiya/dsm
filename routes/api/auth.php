@@ -17,4 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Send invitation (protected)
     Route::post('/send-invitation', [AuthController::class, 'inviteUser']);
+    Route::get('/invitations', [AuthController::class, 'listInvitations']);
+    Route::delete('/invitations/{id}', [AuthController::class, 'cancelInvitation']);
+
+
 });
