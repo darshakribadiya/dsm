@@ -111,7 +111,7 @@
                 <p>Hello,</p>
 
                 <p>You have been invited to join <strong>{{ config('app.name') }}</strong> as a
-                    <strong>{{ $invitation->role->name }}</strong>.
+                    <strong>{{ $invitation->role->label }}</strong>.
                 </p>
 
                 <p>To accept this invitation and set up your account, please click below:</p>

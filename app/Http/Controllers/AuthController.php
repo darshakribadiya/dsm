@@ -36,8 +36,23 @@ class AuthController extends Controller
     public function me(Request $request, AuthService $authService)
     {
         $result = $authService->me($request);
-        return response()->json($result['user'], $result['status']);
+
+        $user = $result['user'];
+
+        $user->load(['roles.permissions', 'permissions']);
+
+        $response = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'user_type' => $user->user_type,
+            'roles' => $user->roles->pluck('role_name'),
+            'permissions' => $user->getAllPermissions(),
+        ];
+
+        return response()->json($response, $result['status']);
     }
+
 
     public function allUsers(Request $request, UserService $userService)
     {

@@ -6,6 +6,7 @@ use App\Mail\Admin\UserCreatedMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use App\Models\User;
@@ -84,6 +85,8 @@ class AuthService
             ->where('expires_at', '>', now())
             ->first();
 
+        Log::info($invitation);
+
         if (!$invitation) {
             return [
                 'status' => 400,
@@ -101,6 +104,7 @@ class AuthService
         $user = User::create([
             'name' => $data['name'],
             'email' => $invitation->email,
+            // 'role' => $invitation->role->
             'password' => Hash::make($data['password']),
         ]);
 
