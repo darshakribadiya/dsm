@@ -12,6 +12,7 @@ Route::post('/accept-invitation', [AuthController::class, 'acceptInvitation']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::patch('/users/{id}/status', [AuthController::class, 'updateStatus']);
 
     Route::get('/all-users', [AuthController::class, 'allUsers']);
 

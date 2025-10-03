@@ -53,7 +53,6 @@ class AuthController extends Controller
         return response()->json($response, $result['status']);
     }
 
-
     public function allUsers(Request $request, UserService $userService)
     {
         $filters = [
@@ -167,6 +166,21 @@ class AuthController extends Controller
         ], 200);
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:active,inactive,suspended',
+        ]);
+
+        $user = User::findOrFail($id);
+        $user->status = $request->status;
+        $user->save();
+
+        return response()->json([
+            'message' => 'User status updated successfully',
+            'user' => $user
+        ], 200);
+    }
 
 
 
