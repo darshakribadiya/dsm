@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Auth\Permission;
 use App\Models\Auth\UserInvitation;
 use App\Models\User;
 use App\Services\Admin\{AuthService, UserService};
@@ -22,7 +23,7 @@ class AuthController extends Controller
         $result = $authService->login($validated);
 
         return response()->json(
-            ['message' => $result['message'], 'data' => $result['data'] ?? null],
+            ['data' => $result['data'] ?? null],
             $result['status']
         );
     }
@@ -166,21 +167,43 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function getUser(Request $request, $id)
     {
-        $request->validate([
-            'status' => 'required|in:active,inactive,suspended',
-        ]);
-
         $user = User::findOrFail($id);
-        $user->status = $request->status;
-        $user->save();
 
         return response()->json([
-            'message' => 'User status updated successfully',
-            'user' => $user
+            'user' => [
+                'id' => $user->id,
+                'status' => $user->status,
+                'roles' => $user->roles->pluck('role_name'),
+                'permissions' => $user->getAllPermissions(),
+            ]
         ], 200);
     }
+
+    /**
+     * Get user roles and permissions with names and IDs
+     */
+    public function getUserRolesAndPermissions(Request $request, $id, AuthService $authService)
+    {
+        $result = $authService->getUserRolesAndPermissions($id);
+        return response()->json($result, 200);
+    }
+
+    public function update(Request $request, $id, AuthService $authService)
+    {
+        $validated = $request->validate([
+            'status' => 'required|in:active,inactive,suspended',
+            'roles' => 'nullable|array',
+            'roles.*' => 'integer|exists:roles,id',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'integer|exists:permissions,id',
+        ]);
+
+        $result = $authService->updateUser($id, $validated);
+        return response()->json($result, 200);
+    }
+
 
 
 

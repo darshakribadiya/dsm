@@ -82,18 +82,19 @@ class User extends Authenticatable
 
     public function getAllPermissions(): array
     {
-        $directPermissions = $this->permissions->pluck('permission_name');
+        $this->loadMissing(['permissions', 'roles.permissions']);
 
-        $rolePermissions = $this->roles
-            ->flatMap(fn($role) => $role->permissions->pluck('permission_name'))
-            ->unique();
+        $allPermissions = $this->permissions
+            ->merge($this->roles->flatMap(fn($role) => $role->permissions))
+            ->unique('id');
 
-        return $directPermissions
-            ->merge($rolePermissions)
-            ->unique()
-            ->values()
+        return $allPermissions
+            ->groupBy('permission_name')
+            ->map(fn($group) => $group->pluck('action')->values())
             ->toArray();
     }
+
+
 
 
 }

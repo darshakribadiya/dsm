@@ -32,9 +32,9 @@ class AuthService
 
         return [
             'success' => true,
-            'message' => 'Login successful',
             'status' => 200,
             'data' => [
+                'message' => 'Login successful',
                 'token' => $token,
                 'user' => $user,
             ],
@@ -159,6 +159,99 @@ class AuthService
         return $query->get();
     }
 
+    /**
+     * Get user roles and permissions with names and IDs
+     */
+    public function getUserRolesAndPermissions(int $userId): array
+    {
+        $user = User::findOrFail($userId);
+        
+        // Load relationships
+        $user->load(['roles', 'permissions']);
 
+        // Get roles with both ID and name
+        $roles = $user->roles->map(function ($role) {
+            return [
+                'id' => $role->id,
+                'name' => $role->role_name,
+                'label' => $role->label ?? null
+            ];
+        })->values();
+
+        // Get direct permissions with both ID and name
+        $directPermissions = $user->permissions->map(function ($permission) {
+            return [
+                'id' => $permission->id,
+                'name' => $permission->permission_name,
+                'action' => $permission->action ?? null
+            ];
+        })->values();
+
+        // Get role permissions with both ID and name
+        $rolePermissions = $user->roles->flatMap(function ($role) {
+            return $role->permissions->map(function ($permission) use ($role) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->permission_name,
+                    'action' => $permission->action ?? null,
+                    'via_role' => $role->role_name
+                ];
+            });
+        })->unique('id')->values();
+
+        // Get all permissions (direct + role-based) with deduplication
+        $allPermissions = collect($directPermissions)->merge(collect($rolePermissions))->unique('id')->values();
+
+        return [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'status' => $user->status,
+                'user_type' => $user->user_type,
+            ],
+            'roles' => $roles,
+            'permissions' => [
+                'direct' => $directPermissions,
+                'via_roles' => $rolePermissions,
+                'all' => $allPermissions
+            ]
+        ];
+    }
+
+    /**
+     * Update user with roles and permissions
+     */
+    public function updateUser(int $userId, array $data): array
+    {
+        $user = User::findOrFail($userId);
+        
+        // Update user status
+        $user->status = $data['status'];
+        $user->save();
+
+        // Sync roles if provided
+        if (isset($data['roles'])) {
+            $user->roles()->sync($data['roles']);
+        }
+
+        // Sync permissions if provided
+        if (isset($data['permissions'])) {
+            $user->permissions()->sync($data['permissions']);
+        }
+
+        // Reload relationships to get updated data
+        $user->load(['roles', 'permissions']);
+
+        return [
+            'message' => 'User updated successfully',
+            'user' => [
+                'id' => $user->id,
+                'status' => $user->status,
+                'roles' => $user->roles->pluck('role_name'),
+                'permissions' => $user->getAllPermissions(),
+            ]
+        ];
+    }
 
 }

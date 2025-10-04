@@ -12,9 +12,12 @@ Route::post('/accept-invitation', [AuthController::class, 'acceptInvitation']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::patch('/users/{id}/status', [AuthController::class, 'updateStatus']);
+
 
     Route::get('/all-users', [AuthController::class, 'allUsers']);
+    Route::get('users/{user}', [AuthController::class, 'getUser']);
+    Route::get('users/{user}/roles-permissions', [AuthController::class, 'getUserRolesAndPermissions']);
+    Route::patch('users/{user}/update', [AuthController::class, 'update']);
 
     // Send invitation (protected)
     Route::post('/send-invitation', [AuthController::class, 'inviteUser']);
