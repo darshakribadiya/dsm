@@ -3,3 +3,10 @@ php artisan migrate --path=database/migrations/01-default
 php artisan migrate --path=database/migrations/02-auth
 php artisan migrate --path=database/migrations/03-academic
 php artisan migrate --path=database/migrations/04-student
+
+
+php artisan migrate:fresh
+php artisan migrate:fresh --path=database/migrations/01-default
+php artisan migrate:fresh --path=database/migrations/02-auth
+php artisan migrate:fresh --path=database/migrations/03-academic
+php artisan migrate:fresh --path=database/migrations/04-student

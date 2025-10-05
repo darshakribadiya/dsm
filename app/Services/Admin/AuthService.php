@@ -85,8 +85,6 @@ class AuthService
             ->where('expires_at', '>', now())
             ->first();
 
-        Log::info($invitation);
-
         if (!$invitation) {
             return [
                 'status' => 400,
@@ -101,11 +99,20 @@ class AuthService
             ];
         }
 
+        $role = $invitation->role;
+
+        $userType = $role ? strtolower($role->role_name) : 'student';
+
+        logger($role);
+
         $user = User::create([
             'name' => $data['name'],
             'email' => $invitation->email,
-            // 'role' => $invitation->role->
+            'contact' => $data['contact'],
+            'user_type' => $userType,
             'password' => Hash::make($data['password']),
+            'created_by' => $invitation->invited_by,
+
         ]);
 
         $user->roles()->attach($invitation->role_id);
@@ -165,7 +172,7 @@ class AuthService
     public function getUserRolesAndPermissions(int $userId): array
     {
         $user = User::findOrFail($userId);
-        
+
         // Load relationships
         $user->load(['roles', 'permissions']);
 
@@ -225,7 +232,7 @@ class AuthService
     public function updateUser(int $userId, array $data): array
     {
         $user = User::findOrFail($userId);
-        
+
         // Update user status
         $user->status = $data['status'];
         $user->save();
@@ -253,5 +260,4 @@ class AuthService
             ]
         ];
     }
-
 }

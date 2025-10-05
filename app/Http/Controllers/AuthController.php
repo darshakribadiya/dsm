@@ -106,9 +106,10 @@ class AuthController extends Controller
             'token' => 'required|string',
             'password' => 'required|string|min:8|confirmed',
             'name' => 'required|string|max:255',
+            'contact' => 'nullable',
         ]);
 
-        $result = $authService->acceptInvitation($request->only(['token', 'password', 'name']));
+        $result = $authService->acceptInvitation($request->only(['token', 'password', 'name', 'contact']));
 
         return response()->json(
             isset($result['data']) ? ['message' => $result['message'], 'data' => $result['data']] : ['message' => $result['message']],
@@ -203,9 +204,4 @@ class AuthController extends Controller
         $result = $authService->updateUser($id, $validated);
         return response()->json($result, 200);
     }
-
-
-
-
-
 }
