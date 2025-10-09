@@ -82,7 +82,7 @@
                 <p>You can now log in using your email: <strong>{{ $user->email }}</strong></p>
 
                 <div style="text-align: center;">
-                    <a href="{{ env('FRONTEND_APP_URL') }}/login" class="button">Login to Dashboard</a>
+                    <a href="{{ env('FRONTEND_URL') }}/login" class="button">Login to Dashboard</a>
                 </div>
 
                 <p>We’re excited to have you onboard.</p>

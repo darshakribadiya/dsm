@@ -39,7 +39,7 @@ class UserInvitationMail extends Mailable
      */
     public function content(): Content
     {
-        $frontendUrl = env('FRONTEND_APP_URL');
+        $frontendUrl = env('FRONTEND_URL');
         $invitationLink = $frontendUrl . '/accept-invitation?token=' . $this->invitation->token;
 
         return new Content(

@@ -3,17 +3,19 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Auth\{Role, Permission};
+use App\Models\Auth\{PasswordResetOtp, Role, Permission};
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-
+use App\Notifications\CustomResetPasswordNotification;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable, HasApiTokens, CanResetPassword;
 
     protected $fillable = [
         'name',
@@ -46,6 +48,12 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // 🔹 Password Reset
+    public function passwordResetOtps()
+    {
+        return $this->hasMany(PasswordResetOtp::class, 'user_id');
     }
 
     // 🔹 Roles relationship
@@ -95,6 +103,8 @@ class User extends Authenticatable
     }
 
 
-
-
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new CustomResetPasswordNotification($token));
+    }
 }
