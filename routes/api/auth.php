@@ -7,8 +7,9 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Password reset (public)
 Route::post('forgot-password', [AuthController::class, 'sendResetLink']);
+Route::post('reset-password-link', [AuthController::class, 'resetPasswordLinkBase']);
 Route::post('send-reset-otp', [AuthController::class, 'sendResetOtp']);
-Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::post('reset-password-otp', [AuthController::class, 'resetPasswordOtpBase']);
 
 // Invitation routes (public)
 Route::get('/invitation', [AuthController::class, 'getInvitation']);

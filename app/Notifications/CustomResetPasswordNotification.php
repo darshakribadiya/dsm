@@ -14,14 +14,16 @@ class CustomResetPasswordNotification extends ResetPassword
 
     public function toMail($notifiable)
     {
-        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
+        $frontendUrl = config('app.frontend_url');
         $resetUrl = "{$frontendUrl}/reset-password/{$this->token}?email={$notifiable->email}";
 
         return (new MailMessage)
             ->subject('Reset Your Password | ' . config('app.name'))
-            ->markdown('Admin.Mail.password-reset-link', [
+            ->view('Admin.Mail.password-reset-link', [
                 'url' => $resetUrl,
                 'name' => $notifiable->name,
+                'email' => $notifiable->email,
+                'app' => config('app.name'),
             ]);
     }
 }

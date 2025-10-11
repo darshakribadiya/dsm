@@ -1,64 +1,90 @@
-<x-mail::message>
-    {{-- Greeting --}}
-    @if (!empty($greeting))
-        # {{ $greeting }}
-    @else
-        @if ($level === 'error')
-            # @lang('Oops!')
-        @else
-            # @lang('Hello,')
-        @endif
-    @endif
+<!DOCTYPE html>
+<html lang="en">
 
-    {{-- Intro Lines --}}
-    @foreach ($introLines as $line)
-        {{ $line }}
-    @endforeach
+<head>
+    <meta charset="UTF-8">
+    <title>Password Reset - {{ $app }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
 
-    {{-- Action Button --}}
-    @isset($actionText)
-        <?php
-        // Customize button color logic
-        $color = match ($level) {
-            'success' => 'green',
-            'error' => 'red',
-            default => 'blue',
-        };
-        ?>
-        <x-mail::button :url="$actionUrl" :color="$color"
-            style="border-radius: 8px; padding: 12px 24px; font-weight: bold;">
-            {{ $actionText }}
-        </x-mail::button>
-    @endisset
+        .container {
+            max-width: 600px;
+            background: #ffffff;
+            margin: 40px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
 
-    {{-- Outro Lines --}}
-    @foreach ($outroLines as $line)
-        {{ $line }}
-    @endforeach
+        .header {
+            background: #1d4ed8;
+            color: #ffffff;
+            text-align: center;
+            padding: 24px;
+            font-size: 24px;
+            font-weight: bold;
+        }
 
-    {{-- Salutation --}}
-    @if (!empty($salutation))
-        {{ $salutation }}
-    @else
-        @lang('Regards,')<br>
-        <strong>{{ config('app.name') }}</strong>
-    @endif
+        .content {
+            padding: 24px;
+            line-height: 1.6;
+        }
 
-    {{-- Subcopy --}}
-    @isset($actionText)
-        <x-slot:subcopy>
-            @lang("If you're having trouble clicking the \":actionText\" button, copy and paste the URL below into your web browser:", ['actionText' => $actionText])
-            <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
-        </x-slot:subcopy>
-    @endisset
+        .btn {
+            display: inline-block;
+            background: #2563eb;
+            color: #ffffff !important;
+            padding: 14px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 20px 0;
+        }
 
-    {{-- Optional Footer Logo --}}
-    <x-slot:footer>
-        <div style="text-align: center; margin-top: 20px;">
-            <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.name') }}" width="120">
-            <p style="font-size: 12px; color: #888;">© {{ date('Y') }} {{ config('app.name') }}. All rights
-                reserved.</p>
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+            padding: 20px;
+        }
+
+        .footer img {
+            max-width: 120px;
+            margin-bottom: 10px;
+        }
+
+        .break-all {
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">{{ $app }}</div>
+        <div class="content">
+            <p>Hi {{ $name }},</p>
+            <p>We received a request to reset the password for your account ({{ $email }}).</p>
+            <p>To reset your password, click the button below:</p>
+            <p style="text-align: center;">
+                <a href="{{ $url }}" class="btn">Reset Password</a>
+            </p>
+            <p>If the button above doesn’t work, copy and paste the following URL into your browser:</p>
+            <p class="break-all">{{ $url }}</p>
+            <p>If you did not request a password reset, no further action is required.</p>
+            <p>Regards,<br><strong>{{ $app }} Team</strong></p>
         </div>
-    </x-slot:footer>
+        <div class="footer">
+            <img src="{{ asset('images/logo.png') }}" alt="{{ $app }}">
+            <p>© {{ date('Y') }} {{ $app }}. All rights reserved.</p>
+        </div>
+    </div>
+</body>
 
-</x-mail::message>
+</html>
